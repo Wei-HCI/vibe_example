@@ -93,7 +93,7 @@ The following prompts were used with an AI coding assistant to generate violin p
 
 **Prompt 1** — Generate violin plot script:
 
-> Based on the CSV file in my text_dataset directory, write a script to generate violin plots by calling the functions from this project.
+> Based on the CSV file in my text_dataset directory, write a script to generate violin plots by calling the functions from this project, and run this script in "myenv" environment.
 
 **Prompt 2** — Customize colors and style:
 
