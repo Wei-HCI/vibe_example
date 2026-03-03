@@ -23,20 +23,12 @@
 | pyperclip | >= 1.8 |
 | openpyxl | >= 3.1 |
 
-### Optional Dependencies
-
-| Package | Version | Purpose |
-|---|---|---|
-| pygmo | >= 2.19 | Faster Pareto front computation |
-
-
 ## Installation
 
 **Option 1: Using requirements.txt (recommended for reproducible environments)**
 
 ```bash
 pip install -r requirements.txt        # core dependencies
-pip install -r requirements-dev.txt    # dev/test dependencies (optional)
 pip install -e .                       # install the package itself
 ```
 
@@ -46,6 +38,12 @@ pip install -e .                       # install the package itself
 - **APA-Compliant LaTeX Reporting**: Generate copy-paste-ready LaTeX strings for NPAV, ART, Dunn tests, mean/SD, and more.
 - **Enhanced Visualizations**: Box/violin plots with automatic parametric/non-parametric test selection and significance annotations.
 - **Data Processing Utilities**: Normalize, replace values, Pareto front classification, REI-based outlier detection.
+
+## Visualization Example
+
+Below is an exploratory data analysis produced with `rcode.visualization`, demonstrating histogram, scatter plot with regression line, correlation matrix, and box plot outputs:
+
+![Exploratory Data Analysis — WHO Life Expectancy Dataset](figures/eda_example.png)
 
 ## Quick Start
 
