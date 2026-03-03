@@ -29,12 +29,6 @@
 |---|---|---|
 | pygmo | >= 2.19 | Faster Pareto front computation |
 
-### Dev Dependencies
-
-| Package | Version |
-|---|---|
-| pytest | >= 7.0 |
-| pytest-cov | >= 4.0 |
 
 ## Installation
 
@@ -44,30 +38,6 @@
 pip install -r requirements.txt        # core dependencies
 pip install -r requirements-dev.txt    # dev/test dependencies (optional)
 pip install -e .                       # install the package itself
-```
-
-**Option 2: Using pyproject.toml (all-in-one)**
-
-```bash
-pip install -e ".[dev]"
-```
-
-**Option 3: Only install core dependencies without editable mode**
-
-```bash
-pip install .
-```
-
-## Running Tests
-
-```bash
-pytest tests/ -v
-```
-
-With coverage report:
-
-```bash
-pytest tests/ -v --cov=rcode --cov-report=term-missing
 ```
 
 ## Key Features
