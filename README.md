@@ -25,7 +25,25 @@
 
 ## Installation
 
-**Option 1: Using requirements.txt (recommended for reproducible environments)**
+> **⚠️ It is strongly recommended to create a dedicated conda environment** to avoid dependency conflicts.
+
+### Recommended: Using Conda
+
+```bash
+# 1. Create a new conda environment with the required Python version
+conda create -n rcode python=3.10 -y
+
+# 2. Activate the environment
+conda activate rcode
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Install the package itself
+pip install -e .
+```
+
+### Alternative: Using pip directly
 
 ```bash
 pip install -r requirements.txt        # core dependencies
