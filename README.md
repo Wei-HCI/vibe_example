@@ -54,6 +54,85 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+## Claude Code Setup (via Alibaba Cloud Coding Plan)
+
+This project can be used with [Claude Code](https://code.claude.com/docs/en/overview) powered by [Alibaba Cloud Coding Plan](https://help.aliyun.com/zh/model-studio/claude-code-coding-plan). Follow the steps below to configure your environment.
+
+### Step 1: Install Claude Code
+
+Make sure [Node.js](https://nodejs.org/en/download/) (v18.0+) is installed, then run:
+
+```bash
+npm install -g @anthropic-ai/claude-code
+claude --version   # verify installation
+```
+
+### Step 2: Configure API access
+
+**macOS / Linux:**
+
+```bash
+mkdir -p ~/.claude
+nano ~/.claude/settings.json
+```
+
+**Windows (PowerShell):**
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude"
+notepad "$env:USERPROFILE\.claude\settings.json"
+```
+
+Paste the following into `settings.json`:
+
+```json
+{
+    "env": {
+        "ANTHROPIC_AUTH_TOKEN": "sk-sp-92cfc7ad460242aeac574fa8e7163384",
+        "ANTHROPIC_BASE_URL": "https://coding.dashscope.aliyuncs.com/apps/anthropic",
+        "ANTHROPIC_MODEL": "MiniMax-M2.5"
+    }
+}
+```
+
+Then create or edit `~/.claude.json` (or `%USERPROFILE%\.claude.json` on Windows) and add:
+
+```json
+{
+  "hasCompletedOnboarding": true
+}
+```
+
+> This prevents the `Unable to connect to Anthropic services` error on first launch.
+
+### Step 3: Launch Claude Code
+
+```bash
+cd path/to/your_project
+claude
+```
+
+Use `/status` to verify the model, API key, and base URL are configured correctly.
+
+### Step 4 (Optional): VS Code Plugin
+
+1. Open VS Code → Extensions → search for **Claude Code for VS Code** and install.
+2. Restart VS Code, click the Claude Code icon in the top-right corner.
+3. Type `/` → select **General config** → set the model to `MiniMax-M2.5`.
+
+### Useful Commands
+
+| Command | Description |
+|---|---|
+| `/status` | Check current model, API key, and base URL |
+| `/model <name>` | Switch model (e.g. `/model MiniMax-M2.5`) |
+| `/init` | Generate `CLAUDE.md` for project-level instructions |
+| `/clear` | Clear conversation history |
+| `/plan` | Planning mode (analyze only, no code changes) |
+| `/compact` | Compress conversation history to free context window |
+
+For more details, see the [official Claude Code documentation](https://code.claude.com/docs/en/overview) and [Alibaba Cloud Coding Plan guide](https://help.aliyun.com/zh/model-studio/claude-code-coding-plan).
+
 ## Key Features
 
 - **Automated Assumption Checking**: Verify normality (Shapiro-Wilk) and homogeneity of variance (Levene's test) for ANOVA models.
