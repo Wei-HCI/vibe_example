@@ -25,29 +25,33 @@
 
 ## Installation
 
-> **⚠️ It is strongly recommended to create a dedicated conda environment** to avoid dependency conflicts.
+> **⚠️ It is strongly recommended to create a dedicated virtual environment** to avoid dependency conflicts.
 
-### Recommended: Using Conda
+### Step 1: Create a virtual environment
 
 ```bash
-# 1. Create a new conda environment with the required Python version
-conda create -n rcode python=3.10 -y
-
-# 2. Activate the environment
-conda activate rcode
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Install the package itself
-pip install -e .
+python -m venv myenv
 ```
 
-### Alternative: Using pip directly
+### Step 2: Activate the environment
+
+**Windows:**
 
 ```bash
-pip install -r requirements.txt        # core dependencies
-pip install -e .                       # install the package itself
+myenv\Scripts\activate
+```
+
+**macOS / Linux:**
+
+```bash
+source myenv/bin/activate
+```
+
+### Step 3: Install dependencies
+
+```bash
+pip install -r requirements.txt
+pip install -e .
 ```
 
 ## Key Features
@@ -81,16 +85,39 @@ print(result)
 report_mean_and_sd(df, iv="group", dv="score")
 ```
 
-## Module Overview
 
-| Module | Description |
-|---|---|
-| `rcode.setup` | Environment configuration, citation printing |
-| `rcode.utils` | Utility functions (`normalize`, `na_zero`, `path_prep`, etc.) |
-| `rcode.assumptions` | ANOVA assumption checking (normality, homogeneity) |
-| `rcode.reporting` | APA-compliant LaTeX report generation |
-| `rcode.visualization` | Statistical plots with automatic test selection |
-| `rcode.data_processing` | Data reshaping, Pareto analysis, REI outlier detection |
+
+## Prompt Example: Generate Custom Violin Plots
+
+The following prompts were used with an AI coding assistant to generate violin plots from the dataset in this project.
+
+**Prompt 1** — Generate violin plot script:
+
+> Based on the CSV file in my figures directory, write a script to generate violin plots by calling the functions from this project.
+
+**Prompt 2** — Customize colors and style:
+
+> Change the colors of the three groups to match the reference image (green, orange, purple), remove all scatter points from the violin plot, and keep only the mean.
+
+### Sample Output
+
+The script generates both violin plots and paper-style LaTeX text for each dependent variable. Example output:
+
+```latex
+\textit{FVR} ($M = 23.23$, $SD = 4.01$) did not differ significantly from
+\textit{Remote} ($M = 23.03$, $SD = 2.76$) in spatial presence (sp)
+($t(29) = 0.30$, $p = .766$).
+
+\textit{LocoScooter} ($M = 6.07$, $SD = 0.62$) was rated significantly higher
+than \textit{Joystick} ($M = 3.36$, $SD = 1.69$) in physical demand
+($W = 91$, $p = .001$, $r = 0.64$).
+```
+
+The function `report_pairwise_paper_style()` automatically:
+1. Checks normality of paired differences (Shapiro-Wilk)
+2. Selects the appropriate test (paired *t*-test or Wilcoxon signed-rank)
+3. Reports *M*, *SD*, test statistic, *p*-value
+4. Includes effect size (Cohen's *d* or rank-biserial *r*) for significant results
 
 ## Citation
 
@@ -103,3 +130,47 @@ report_mean_and_sd(df, iv="group", dv="score")
   doi          = {10.5281/zenodo.16875755}
 }
 ```
+
+## Module Overview
+
+| Module | Description |
+|---|---|
+| `rcode.setup` | Environment configuration, citation printing |
+| `rcode.utils` | Utility functions (`normalize`, `na_zero`, `path_prep`, etc.) |
+| `rcode.assumptions` | ANOVA assumption checking (normality, homogeneity) |
+| `rcode.reporting` | APA-compliant LaTeX report generation |
+| `rcode.visualization` | Statistical plots with automatic test selection |
+| `rcode.data_processing` | Data reshaping, Pareto analysis, REI outlier detection |
+
+## Available Visualizations
+
+All plots are built on matplotlib/seaborn and return `Figure` and `Axes` objects for further customization and saving.
+
+| Plot Type | Function | Description |
+|---|---|---|
+| Box/Violin Plot (within-subjects) | `gg_withinstats_with_normality_check()` | Box + violin plot with significance annotations; automatically selects parametric or non-parametric test based on Shapiro-Wilk normality check |
+| Box/Violin Plot (between-subjects) | `gg_betweenstats_with_normality_check()` | Same as above, but for independent (between-subjects) comparisons |
+| Effect Plot | `generate_effect_plot()` | Displays main or interaction effects with error bars and trend lines; suitable for multi-factor experiments |
+| MOBO Plot | `generate_mobo_plot()` | Multi-objective Bayesian optimization plot showing sampling and optimization phases with per-group trend lines and polynomial fitting |
+
+## Available Analyses & Reporting
+
+| Category | Function | Description |
+|---|---|---|
+| Normality Test | `check_normality_by_group()` | Per-group Shapiro-Wilk normality test |
+| ANOVA Assumption Check | `check_assumptions_for_anova()` | One-step check of normality (residuals + groups) and homogeneity of variance (Levene's test); automatically determines whether parametric or non-parametric ANOVA should be used |
+| NPAV Report (F-based) | `report_npav()` | Generates APA-formatted LaTeX report with partial η²ₚ effect size and confidence intervals |
+| NPAV Report (Chi²-based) | `report_npav_chi()` | Same as above but based on chi-square statistic, with Cohen's *w* effect size |
+| ART ANOVA Report | `report_art()` | LaTeX report for Aligned Rank Transform ANOVA |
+| nparLD Report | `report_npar_ld()` | Non-parametric longitudinal data analysis report |
+| Mean & SD Report | `report_mean_and_sd()` | Outputs per-group *M* and *SD* in LaTeX format |
+| Dunn Post-hoc Report | `report_dunn_test()` / `report_dunn_test_table()` | Significant pairwise group comparisons with rank-biserial effect size |
+| ggstatsplot-style Report | `report_ggstatsplot()` / `report_ggstatsplot_posthoc()` | Auto-generates APA reports for Kruskal-Wallis, t-test, Wilcoxon, etc. |
+| Effect Size Calculation | `r_from_wilcox()` / `r_from_npav()` | Computes Rosenthal *r* effect size from Wilcoxon/NPAV p-values |
+| LaTeX Formatting | `latexify_report()` | Converts report text to LaTeX format (R², itemize, etc.) |
+| Normalization | `normalize()` | Linear rescaling to an arbitrary range |
+| Pareto Front Classification | `add_pareto_column()` | Multi-objective Pareto non-dominated sorting (with optional pygmo acceleration) |
+| REI Outlier Detection | `remove_outliers_rei()` | Flags suspicious survey responses based on Response Entropy Index |
+| Data Reshaping | `reshape_data()` | Converts wide-format Excel data to long format |
+| Value Replacement | `replace_values()` | Batch value replacement across a DataFrame |
+| Paper-style Pairwise Report | `report_pairwise_paper_style()` | Auto-selects paired t-test or Wilcoxon based on Shapiro-Wilk normality check; generates LaTeX text with *M*, *SD*, test statistic, *p*-value, and effect size (Cohen's *d* or rank-biserial *r*) in APA paper style |

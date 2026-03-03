@@ -28,6 +28,7 @@ from rcode.reporting import (
     report_dunn_test,
     report_dunn_test_table,
     r_from_wilcox,
+    report_pairwise_paper_style,
     r_from_npav,
     latexify_report,
 )

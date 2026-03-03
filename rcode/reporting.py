@@ -817,3 +817,187 @@ def _maybe_clip(text: str, do_clip: bool) -> None:
             pyperclip.copy(text)
         except Exception:
             pass
+
+
+# ── Paper-style pairwise reporting ──────────────────────────────────────── #
+
+def report_pairwise_paper_style(
+    data: pd.DataFrame,
+    iv: str,
+    dv: str,
+    dv_label: Optional[str] = None,
+    paired: bool = True,
+    alpha: float = 0.05,
+    condition_labels: Optional[Dict[str, str]] = None,
+) -> str:
+    r"""Generate paper-style LaTeX text for pairwise comparisons.
+
+    Workflow (within-subject / paired design):
+    1. Check normality of paired differences via Shapiro-Wilk.
+    2. If normal → paired t-test, report Cohen's *d* for significant results.
+    3. If not normal → Wilcoxon signed-rank test, report rank-biserial *r*.
+    4. Alpha = 0.05.
+
+    Workflow (between-subject / independent design):
+    1. Check normality per group via Shapiro-Wilk.
+    2. If normal → independent t-test, report Cohen's *d*.
+    3. If not normal → Mann-Whitney U test, report rank-biserial *r*.
+
+    Output examples (LaTeX):
+        \\textit{A} ($M = 6.07$, $SD = 0.62$) was rated significantly higher
+        than \\textit{B} ($M = 3.36$, $SD = 1.69$) in physical demand
+        ($W = 91$, $p = .001$, $r = 0.64$).
+
+        \\textit{A} ($M = 517.7$\\,s, $SD = 129.1$\\,s) did not differ
+        significantly from \\textit{B} ($M = 500.4$\\,s, $SD = 116.7$\\,s)
+        in task completion time ($t(13) = 1.08$, $p = .300$).
+
+    Parameters
+    ----------
+    data : DataFrame
+    iv : str
+        Column name for the independent variable (condition).
+    dv : str
+        Column name for the dependent variable.
+    dv_label : str, optional
+        Human-readable label for the DV in the output text.
+        Defaults to *dv* with underscores replaced by spaces.
+    paired : bool
+        True for within-subjects, False for between-subjects.
+    alpha : float
+        Significance level (default 0.05).
+    condition_labels : dict, optional
+        Map raw condition values to display labels
+        (e.g. ``{"FVR": "Co-located Fully VR"}``).
+
+    Returns
+    -------
+    str
+        LaTeX-formatted paragraph(s) describing all pairwise comparisons.
+    """
+    import itertools
+
+    not_empty(data, "data")
+    not_empty(iv, "iv")
+    not_empty(dv, "dv")
+
+    if dv_label is None:
+        dv_label = dv.replace("_", " ")
+
+    groups = sorted(data[iv].dropna().unique())
+    paragraphs: list[str] = []
+
+    for cond_a, cond_b in itertools.combinations(groups, 2):
+        vals_a = data.loc[data[iv] == cond_a, dv].dropna()
+        vals_b = data.loc[data[iv] == cond_b, dv].dropna()
+
+        if len(vals_a) < 3 or len(vals_b) < 3:
+            continue
+
+        m_a, sd_a = vals_a.mean(), vals_a.std()
+        m_b, sd_b = vals_b.mean(), vals_b.std()
+
+        label_a = condition_labels.get(str(cond_a), str(cond_a)) if condition_labels else str(cond_a)
+        label_b = condition_labels.get(str(cond_b), str(cond_b)) if condition_labels else str(cond_b)
+
+        # ── Decide test type ────────────────────────────────────────────
+        use_parametric = True
+
+        if paired:
+            min_len = min(len(vals_a), len(vals_b))
+            diff = vals_a.values[:min_len] - vals_b.values[:min_len]
+            if len(diff) >= 3 and np.var(diff) > 0:
+                _, p_norm = sp_stats.shapiro(diff)
+                if p_norm < alpha:
+                    use_parametric = False
+            else:
+                use_parametric = False
+        else:
+            for v in [vals_a.values, vals_b.values]:
+                if len(v) >= 3 and np.var(v) > 0:
+                    _, p_sw = sp_stats.shapiro(v)
+                    if p_sw < alpha:
+                        use_parametric = False
+                        break
+
+        # ── Run test ────────────────────────────────────────────────────
+        if paired:
+            min_len = min(len(vals_a), len(vals_b))
+            a_arr = vals_a.values[:min_len]
+            b_arr = vals_b.values[:min_len]
+            n = min_len
+
+            if use_parametric:
+                stat, p = sp_stats.ttest_rel(a_arr, b_arr)
+                df = n - 1
+                # Cohen's d for paired samples
+                diff = a_arr - b_arr
+                d = diff.mean() / diff.std() if diff.std() > 0 else 0.0
+                test_str = f"$t({df}) = {stat:.2f}$, ${_fmt_p_paper(p)}$"
+                if p < alpha:
+                    test_str += f", $d = {abs(d):.2f}$"
+            else:
+                stat, p = sp_stats.wilcoxon(a_arr, b_arr)
+                # Rank-biserial r
+                r_rb = 1 - (2 * stat) / (n * (n + 1) / 2)
+                test_str = f"$W = {stat:.0f}$, ${_fmt_p_paper(p)}$"
+                if p < alpha:
+                    test_str += f", $r = {abs(r_rb):.2f}$"
+        else:
+            a_arr = vals_a.values
+            b_arr = vals_b.values
+
+            if use_parametric:
+                stat, p = sp_stats.ttest_ind(a_arr, b_arr)
+                # Welch df approximation
+                n1, n2 = len(a_arr), len(b_arr)
+                s1, s2 = np.var(a_arr, ddof=1), np.var(b_arr, ddof=1)
+                num = (s1 / n1 + s2 / n2) ** 2
+                den = (s1 / n1) ** 2 / (n1 - 1) + (s2 / n2) ** 2 / (n2 - 1)
+                df = num / den if den > 0 else n1 + n2 - 2
+                # Cohen's d (pooled)
+                pooled_sd = np.sqrt(((n1 - 1) * s1 + (n2 - 1) * s2) / (n1 + n2 - 2))
+                d = (m_a - m_b) / pooled_sd if pooled_sd > 0 else 0.0
+                test_str = f"$t({df:.0f}) = {stat:.2f}$, ${_fmt_p_paper(p)}$"
+                if p < alpha:
+                    test_str += f", $d = {abs(d):.2f}$"
+            else:
+                stat, p = sp_stats.mannwhitneyu(a_arr, b_arr, alternative="two-sided")
+                n1, n2 = len(a_arr), len(b_arr)
+                r_rb = 1 - (2 * stat) / (n1 * n2)
+                test_str = f"$U = {stat:.0f}$, ${_fmt_p_paper(p)}$"
+                if p < alpha:
+                    test_str += f", $r = {abs(r_rb):.2f}$"
+
+        # ── Build sentence ──────────────────────────────────────────────
+        stats_a = rf"\textit{{{label_a}}} ($M = {m_a:.2f}$, $SD = {sd_a:.2f}$)"
+        stats_b = rf"\textit{{{label_b}}} ($M = {m_b:.2f}$, $SD = {sd_b:.2f}$)"
+
+        if p < alpha:
+            # Determine direction
+            if m_a > m_b:
+                higher, lower = stats_a, stats_b
+            else:
+                higher, lower = stats_b, stats_a
+            sentence = (
+                f"{higher} was rated significantly higher than "
+                f"{lower} in {dv_label} ({test_str})."
+            )
+        else:
+            sentence = (
+                f"{stats_a} did not differ significantly from "
+                f"{stats_b} in {dv_label} ({test_str})."
+            )
+
+        paragraphs.append(sentence)
+
+    result = "\n\n".join(paragraphs)
+    print(result)
+    return result
+
+
+def _fmt_p_paper(p: float) -> str:
+    """Format p-value in paper style: p < .001 or p = .XXX"""
+    if p < 0.001:
+        return "p < .001"
+    return f"p = {p:.3f}".replace("0.", ".")
