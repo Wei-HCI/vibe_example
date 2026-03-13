@@ -4,6 +4,16 @@
 
 `rcode` is a Python package that streamlines statistical analysis and APA-compliant result reporting. It is a port of the original R package, built on top of `scipy`, `pingouin`, `statsmodels`, `matplotlib`, and `seaborn`.
 
+## What Was Changed in This Python Port
+
+Compared to Mark Colley's original `rCode` (R), this Python edition mainly introduces:
+
+- A modular Python package layout (`rcode.setup`, `rcode.assumptions`, `rcode.reporting`, `rcode.visualization`, `rcode.data_processing`, `rcode.utils`) for reusable workflow-based analysis.
+- Python-native statistical integration based on `scipy`, `pingouin`, `statsmodels`, and `scikit-posthocs` to reproduce and extend core inferential workflows.
+- Automated APA-oriented reporting helpers that generate publication-ready LaTeX strings (e.g., NPAV, ART, Dunn, pairwise paper-style results with effect sizes).
+- Expanded plotting utilities for within/between-subject comparisons and multi-factor effect visualization using matplotlib/seaborn objects (`Figure`, `Axes`) for downstream customization.
+- Extra data-processing helpers (normalization, reshaping, value replacement, Pareto sorting, REI outlier detection) to support end-to-end analysis pipelines in Python.
+
 ## Requirements
 
 - Python >= 3.10
@@ -177,58 +187,3 @@ The function `report_pairwise_paper_style()` automatically:
 3. Reports *M*, *SD*, test statistic, *p*-value
 4. Includes effect size (Cohen's *d* or rank-biserial *r*) for significant results
 
-## Citation
-
-```bibtex
-@misc{colley2024rcode,
-  author       = {Mark Colley},
-  title        = {rCode: Enhanced R Functions for Statistical Analysis and Reporting},
-  year         = {2024},
-  howpublished = {\url{https://github.com/M-Colley/rCode}},
-  doi          = {10.5281/zenodo.16875755}
-}
-```
-
-## Module Overview
-
-| Module | Description |
-|---|---|
-| `rcode.setup` | Environment configuration, citation printing |
-| `rcode.utils` | Utility functions (`normalize`, `na_zero`, `path_prep`, etc.) |
-| `rcode.assumptions` | ANOVA assumption checking (normality, homogeneity) |
-| `rcode.reporting` | APA-compliant LaTeX report generation |
-| `rcode.visualization` | Statistical plots with automatic test selection |
-| `rcode.data_processing` | Data reshaping, Pareto analysis, REI outlier detection |
-
-## Available Visualizations
-
-All plots are built on matplotlib/seaborn and return `Figure` and `Axes` objects for further customization and saving.
-
-| Plot Type | Function | Description |
-|---|---|---|
-| Box/Violin Plot (within-subjects) | `gg_withinstats_with_normality_check()` | Box + violin plot with significance annotations; automatically selects parametric or non-parametric test based on Shapiro-Wilk normality check |
-| Box/Violin Plot (between-subjects) | `gg_betweenstats_with_normality_check()` | Same as above, but for independent (between-subjects) comparisons |
-| Effect Plot | `generate_effect_plot()` | Displays main or interaction effects with error bars and trend lines; suitable for multi-factor experiments |
-| MOBO Plot | `generate_mobo_plot()` | Multi-objective Bayesian optimization plot showing sampling and optimization phases with per-group trend lines and polynomial fitting |
-
-## Available Analyses & Reporting
-
-| Category | Function | Description |
-|---|---|---|
-| Normality Test | `check_normality_by_group()` | Per-group Shapiro-Wilk normality test |
-| ANOVA Assumption Check | `check_assumptions_for_anova()` | One-step check of normality (residuals + groups) and homogeneity of variance (Levene's test); automatically determines whether parametric or non-parametric ANOVA should be used |
-| NPAV Report (F-based) | `report_npav()` | Generates APA-formatted LaTeX report with partial η²ₚ effect size and confidence intervals |
-| NPAV Report (Chi²-based) | `report_npav_chi()` | Same as above but based on chi-square statistic, with Cohen's *w* effect size |
-| ART ANOVA Report | `report_art()` | LaTeX report for Aligned Rank Transform ANOVA |
-| nparLD Report | `report_npar_ld()` | Non-parametric longitudinal data analysis report |
-| Mean & SD Report | `report_mean_and_sd()` | Outputs per-group *M* and *SD* in LaTeX format |
-| Dunn Post-hoc Report | `report_dunn_test()` / `report_dunn_test_table()` | Significant pairwise group comparisons with rank-biserial effect size |
-| ggstatsplot-style Report | `report_ggstatsplot()` / `report_ggstatsplot_posthoc()` | Auto-generates APA reports for Kruskal-Wallis, t-test, Wilcoxon, etc. |
-| Effect Size Calculation | `r_from_wilcox()` / `r_from_npav()` | Computes Rosenthal *r* effect size from Wilcoxon/NPAV p-values |
-| LaTeX Formatting | `latexify_report()` | Converts report text to LaTeX format (R², itemize, etc.) |
-| Normalization | `normalize()` | Linear rescaling to an arbitrary range |
-| Pareto Front Classification | `add_pareto_column()` | Multi-objective Pareto non-dominated sorting (with optional pygmo acceleration) |
-| REI Outlier Detection | `remove_outliers_rei()` | Flags suspicious survey responses based on Response Entropy Index |
-| Data Reshaping | `reshape_data()` | Converts wide-format Excel data to long format |
-| Value Replacement | `replace_values()` | Batch value replacement across a DataFrame |
-| Paper-style Pairwise Report | `report_pairwise_paper_style()` | Auto-selects paired t-test or Wilcoxon based on Shapiro-Wilk normality check; generates LaTeX text with *M*, *SD*, test statistic, *p*-value, and effect size (Cohen's *d* or rank-biserial *r*) in APA paper style |
