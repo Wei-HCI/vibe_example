@@ -161,7 +161,7 @@ The following prompts were used with an AI coding assistant to generate violin p
 
 **Prompt 1** — Generate violin plot script:
 
-> Based on the CSV file in my text_dataset directory, write a script to generate violin plots by calling the functions from this project, and run this script in "myenv" environment.
+> Based on the raw questionnaire file in my text_dataset directory, identify the questionnaire type, preprocess the data with the scoring rules defined in this project, export a cleaned scored CSV containing only the final analysis variables, then generate the requested plots (for example violin plots) by calling the functions from this project, and run the script in myenv.
 
 **Prompt 2** — Customize colors and style:
 
@@ -180,6 +180,10 @@ The script generates both violin plots and paper-style LaTeX text for each depen
 than \textit{Joystick} ($M = 3.36$, $SD = 1.69$) in physical demand
 ($W = 91$, $p = .001$, $r = 0.64$).
 ```
+
+Example violin plot output:
+
+![Violin Plot Output Sample](figures/image-3.png)
 
 The function `report_pairwise_paper_style()` automatically:
 1. Checks normality of paired differences (Shapiro-Wilk)

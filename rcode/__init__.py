@@ -43,3 +43,8 @@ from rcode.data_processing import (
     add_pareto_column,
     remove_outliers_rei,
 )
+from rcode.questionnaire_processing import (
+    process_ipq,
+    process_ssq,
+    process_sus,
+)
