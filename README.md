@@ -94,7 +94,7 @@ Add the API key in the qwen code, and select the MiniMax-M2.5 model.
 
 ```json
   "env": {
-    "DASHSCOPE_API_KEY": "sk-sp-92cfc7ad460242aeac574fa8e7163384"
+    "DASHSCOPE_API_KEY": "YOUR_API_KEY_HERE"
   },
   "model": {
     "name": "MiniMax-M2.5"
