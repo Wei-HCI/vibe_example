@@ -64,63 +64,12 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-## Qwen Code Setup
+## AI Coding Tool Setup
 
-This project can be used with [Qwen Code](https://github.com/QwenLM/qwen-code), an open-source AI coding agent for the terminal. Follow the steps below to set it up.
+Installation links:
 
-### Step 1: Install Qwen Code
-
-**Linux / macOS:**
-
-```bash
-curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen.sh | bash
-```
-
-**Windows (Run as Administrator CMD):**
-
-```cmd
-curl -fsSL -o %TEMP%\install-qwen.bat https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen.bat && %TEMP%\install-qwen.bat
-```
-
-Or install manually via npm (requires [Node.js](https://nodejs.org/en/download) v20+):
-
-```bash
-npm install -g @qwen-code/qwen-code@latest
-```
-
-### Step 2: Configure API Key
-
-Add the API key in the qwen code, and select the MiniMax-M2.5 model.
-
-```json
-  "env": {
-    "DASHSCOPE_API_KEY": "YOUR_API_KEY_HERE"
-  },
-  "model": {
-    "name": "MiniMax-M2.5"
-  }
-```
-
-### Step 3: Launch Qwen Code
-
-```bash
-cd path/to/your_project
-qwen
-```
-
-Use `/stats` to verify the current session information and model configuration.
-
-### Useful Commands
-
-| Command | Description |
-|---|---|
-| `/help` | Display available commands |
-| `/model <name>` | Switch model (e.g. `/model MiniMax-M2.5`) |
-| `/stats` | Show current session information |
-| `/clear` | Clear conversation history |
-| `/compress` | Compress history to save tokens |
-
-For more details, see the [Qwen Code documentation](https://qwenlm.github.io/qwen-code-docs/en/users/overview) and the [GitHub repository](https://github.com/QwenLM/qwen-code).
+- Claude Code: [https://code.claude.com/docs/en/overview](https://code.claude.com/docs/en/overview)
+- Codex: [https://github.com/openai/codex](https://github.com/openai/codex)
 
 ## Key Features
 
