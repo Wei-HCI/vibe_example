@@ -35,7 +35,7 @@ Compared to Mark Colley's original `rCode` (R), this Python edition mainly intro
 
 ## Installation
 
-> **⚠️ It is strongly recommended to create a dedicated virtual environment** to avoid dependency conflicts.
+> It is strongly recommended to create a dedicated virtual environment to avoid dependency conflicts.
 
 ### Step 1: Create a virtual environment
 
@@ -133,7 +133,7 @@ For more details, see the [Qwen Code documentation](https://qwenlm.github.io/qwe
 
 Below is an exploratory data analysis produced with `rcode.visualization`, demonstrating histogram, scatter plot with regression line, correlation matrix, and box plot outputs:
 
-![Exploratory Data Analysis — WHO Life Expectancy Dataset](figures/eda_example.png)
+![Exploratory Data Analysis - WHO Life Expectancy Dataset](figures/eda_example.png)
 
 ## Quick Start
 
@@ -153,19 +153,35 @@ print(result)
 report_mean_and_sd(df, iv="group", dv="score")
 ```
 
-
-
 ## Prompt Example: Generate Custom Violin Plots
 
-The following prompts were used with an AI coding assistant to generate violin plots from the dataset in this project.
+Use the following prompts with an AI coding assistant when you want the generated analysis script to remain auditable across different models, agents, or API providers.
 
-**Prompt 1** — Generate violin plot script:
+**Prompt 1** - Generate an analysis script with explicit method traceability:
 
-> Based on the raw questionnaire file in my text_dataset directory, identify the questionnaire type, preprocess the data with the scoring rules defined in this project, export a cleaned scored CSV containing only the final analysis variables, then generate the requested plots (for example violin plots) by calling the functions from this project, and run the script in myenv.
+> Based on the raw questionnaire file in my `text_dataset` directory, identify the questionnaire type, preprocess the data with the scoring rules defined in this project, export a cleaned scored CSV containing only the final analysis variables, then generate the requested plots by calling the functions from this project, and run the script in `myenv`.
+>
+> Strict requirements:
+> 1. Reuse functions from this repository whenever a matching function already exists instead of silently re-implementing the analysis logic.
+> 2. At the top of the generated script, add a short `Analysis Plan` comment block that states the detected questionnaire, the dependent variables, whether the design is within-subjects or between-subjects, and the statistical decision rule that will be used.
+> 3. Structure the generated script as clearly separated analysis blocks with numbered section headers, following the style of a research script rather than a compact utility script. At minimum, use blocks for: loading libraries, reading data, cleaning / reshaping, descriptive statistics, assumption checks, main inferential analysis, post-hoc analysis or an explicit "not needed" block, summary of results, and plot generation.
+> 4. Before each block, write a short multi-line comment that states:
+>    - what this block does
+>    - which repository function(s) are used in this block
+>    - what statistical method is being run in this block
+>    - why this method is appropriate for the current design
+>    - what fallback rule applies if the repository does not provide the needed function
+> 5. Inside the script, keep the comments local to the code they describe. Do not only describe the pipeline at the top of the file; the explanation must be repeated block by block where the code is executed.
+> 6. If the repository does not contain a required function, implement the missing step explicitly in the script and label that block as a local fallback rather than a repository-backed step.
+> 7. Print a short method summary to the console before generating plots, including the exact function names used for scoring, assumption checks, inferential testing, post-hoc testing, and reporting.
+> 8. Do not use vague comments such as "run statistics here" or "analyze data". Every analysis block must name the actual method, for example: Shapiro-Wilk, repeated-measures ANOVA, ART, Wilcoxon signed-rank, paired t-test, Holm correction, or descriptive mean/SD reporting.
+> 9. Keep the visualization customization separate from the statistical logic so that later style changes do not alter the analysis path.
+>
+> When refining plot aesthetics later, preserve the analysis comments and the printed method summary unless I explicitly ask to change the statistics.
 
-**Prompt 2** — Customize colors and style:
+**Prompt 2** - Customize colors and style without changing the analysis logic:
 
-> Change the colors of the three groups to match the reference image (green, orange, purple), remove all scatter points from the violin plot, and keep only the mean.
+> Change the colors of the three groups to match the reference image (green, orange, purple), remove all scatter points from the violin plot, keep only the mean, and preserve the existing analysis method comments and printed method summary.
 
 ### Sample Output
 
@@ -190,4 +206,3 @@ The function `report_pairwise_paper_style()` automatically:
 2. Selects the appropriate test (paired *t*-test or Wilcoxon signed-rank)
 3. Reports *M*, *SD*, test statistic, *p*-value
 4. Includes effect size (Cohen's *d* or rank-biserial *r*) for significant results
-
