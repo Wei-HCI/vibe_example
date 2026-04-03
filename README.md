@@ -53,6 +53,76 @@ pip install -e .
 
 The plugin is built around three confirmation nodes.
 
+```text
+/statistical-analysis data.csv
+        |
+        v
+  +-- Phase 1: Data Identification (Automatic) ------------------------+
+  |  Read file -> detect questionnaire type (IPQ / SSQ / NASA-TLX /   |
+  |  generic)                                                          |
+  |  Detect independent variables, dependent variables, and subject ID |
+  |  Detect experimental design (2x2? 2x3? one-factor?)               |
+  |  Detect within-subjects / between-subjects structure              |
+  +-------------------------------------------------------------------+
+        |
+        v
+     * User confirmation: Are the detected questionnaire, design,
+       and variables correct?
+        |
+        v
+  +-- Phase 2: Preprocessing (Automatic) ------------------------------+
+  |  Call rCode scoring functions (for example: process_ipq)          |
+  |  Clean data and handle missing values                             |
+  |  Export cleaned_scored.csv                                        |
+  +-------------------------------------------------------------------+
+        |
+        v
+  +-- Phase 3: Descriptive Statistics (Automatic) ---------------------+
+  |  Summarize by condition with report_mean_and_sd()                 |
+  +-------------------------------------------------------------------+
+        |
+        v
+  +-- Phase 4: Assumption Checks (Automatic) --------------------------+
+  |  Normality test (Shapiro-Wilk per group)                          |
+  |  Sphericity test (Mauchly, when >= 3 conditions)                  |
+  |  Homogeneity test (Levene, for between-subjects designs)          |
+  +-------------------------------------------------------------------+
+        |
+        v
+     * User confirmation: Accept the recommended parametric or
+       non-parametric method for each DV?
+       Example:
+       - "IPQ_SP passes normality -> recommend repeated-measures ANOVA"
+       - "IPQ_REAL violates normality -> recommend Friedman"
+        |
+        v
+  +-- Phase 5: Main Analysis (Automatic) ------------------------------+
+  |  Choose method by design:                                         |
+  |  - 2-condition within  -> paired t-test / Wilcoxon               |
+  |  - 2-condition between -> independent t-test / Mann-Whitney U    |
+  |  - >=3 within          -> rm ANOVA / Friedman                    |
+  |  - >=3 between         -> one-way ANOVA / Kruskal-Wallis         |
+  |  - multi-factor        -> two-way ANOVA / ART                    |
+  +-------------------------------------------------------------------+
+        |
+        v
+     * User confirmation: Review omnibus results and decide whether
+       to continue to post-hoc tests
+        |
+        v
+  +-- Phase 6: Post-hoc Analysis (If Significant) ---------------------+
+  |  Holm-corrected pairwise comparisons                              |
+  |  Effect size calculation (Cohen's d / r)                          |
+  +-------------------------------------------------------------------+
+        |
+        v
+  +-- Phase 7: Outputs (Automatic) ------------------------------------+
+  |  - analyze_xxx.py script (Prompt 1 style traceability comments)   |
+  |  - summary.txt statistical summary                                |
+  |  - figures/ visualizations                                        |
+  +-------------------------------------------------------------------+
+```
+
 ### Confirmation 1: Detection
 
 The workflow scans the file and proposes:
