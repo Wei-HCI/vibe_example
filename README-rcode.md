@@ -1,121 +1,10 @@
-# rcode (Python Edition)
+# rcode — API Reference
 
-> Python port of rCode for statistical analysis support, questionnaire scoring, reporting, and visualization
+Python port of [rCode](https://github.com/) by Mark Colley — a statistical helper library for HCI, VR, and questionnaire-based experimental research.
 
-`rcode` is the library layer in this repository. It provides reusable statistical helpers for HCI, VR, and questionnaire-based experimental research workflows.
+For installation and general usage, see the main [README.md](README.md).
 
-This package is a Python adaptation of the original R project by Mark Colley and focuses on:
-- questionnaire scoring
-- assumption checks
-- APA-style reporting helpers
-- within-subject and between-subject visualization helpers
-- lightweight data processing utilities
-
-## Package Layout
-
-Core modules:
-- `rcode.setup`
-- `rcode.assumptions`
-- `rcode.reporting`
-- `rcode.visualization`
-- `rcode.data_processing`
-- `rcode.questionnaire_processing`
-- `rcode.utils`
-
-Public imports are re-exported in `rcode/__init__.py`.
-
-## What `rcode` Currently Covers
-
-### Questionnaire Processing
-
-Implemented scoring helpers:
-- `process_ipq()`
-- `process_ssq()`
-- `process_sus()`
-
-These functions assume standard item layouts by default, but they also allow explicit column mapping when the file structure differs from the expected layout.
-
-### Assumptions
-
-Implemented helpers include:
-- `check_normality_by_group()`
-- `check_assumptions_for_anova()`
-
-These support coarse screening for ANOVA-style workflows.
-
-### Reporting
-
-Implemented reporting helpers include:
-- `report_mean_and_sd()`
-- `report_npav()`
-- `report_npav_chi()`
-- `report_art()`
-- `report_npar_ld()`
-- `report_dunn_test()`
-- `report_dunn_test_table()`
-- `report_pairwise_paper_style()`
-- `latexify_report()`
-
-These are aimed at publication-ready or paper-style output, often in LaTeX-friendly form.
-
-### Visualization
-
-Implemented plotting helpers include:
-- `gg_withinstats_with_normality_check()`
-- `gg_betweenstats_with_normality_check()`
-- `generate_effect_plot()`
-- `generate_mobo_plot()`
-
-### Data Processing
-
-Implemented processing helpers include:
-- `replace_values()`
-- `reshape_data()`
-- `add_pareto_column()`
-- `remove_outliers_rei()`
-
-## Current Limits
-
-`rcode` does not yet fully wrap every analysis workflow that existed in the original R version.
-
-In particular, the current Python package does not expose a single unified wrapper for:
-- repeated-measures ANOVA omnibus workflows
-- non-parametric omnibus workflows equivalent to the original `np.anova(...)`
-- full ggstatsplot-object-based extraction/reporting workflows
-
-So in generated analysis scripts, you may still see local fallback calls to:
-- `pingouin.rm_anova()`
-- `pingouin.friedman()`
-- `pingouin.pairwise_tests()`
-- `pingouin.sphericity()`
-
-That does not mean the analysis is invalid. It means the orchestration layer is calling established external statistics libraries directly because the wrapper is not yet part of `rcode`.
-
-## Installation
-
-```bash
-python -m venv myenv
-myenv\Scripts\activate
-pip install -r requirements.txt
-pip install -e .
-```
-
-## Core Dependencies
-
-| Package | Version |
-|---|---|
-| numpy | >= 1.24 |
-| pandas | >= 2.0 |
-| scipy | >= 1.10 |
-| matplotlib | >= 3.7 |
-| seaborn | >= 0.12 |
-| statsmodels | >= 0.14 |
-| pingouin | >= 0.5 |
-| scikit-posthocs | >= 0.8 |
-| pyperclip | >= 1.8 |
-| openpyxl | >= 3.1 |
-
-## Example Usage
+## Quick Example
 
 ```python
 import pandas as pd
@@ -128,16 +17,65 @@ print(check_assumptions_for_anova(df, y="score", factors=["group", "condition"])
 print(report_mean_and_sd(df, iv="group", dv="score"))
 ```
 
-## Prompting Guidance
+## Questionnaire Scoring
 
-If you are generating analysis scripts with an AI coding assistant, the safest pattern is:
-- explicitly state the questionnaire type
-- explicitly state the experimental design
-- require repository functions when they exist
-- require explicit fallback labeling when they do not
+| Function | Questionnaire |
+|----------|---------------|
+| `process_ipq()` | Igroup Presence Questionnaire |
+| `process_ssq()` | Simulator Sickness Questionnaire |
+| `process_sus()` | System Usability Scale |
 
-This repository's plugin-oriented Prompt 1 guidance lives in the main [README.md](C:\Users\adminroot\Documents\GitHub\vibe_example\README.md).
+All three assume standard item layouts by default but accept explicit column mapping when the file structure differs.
+
+## Assumption Checks
+
+- `check_normality_by_group()` — Shapiro-Wilk per group
+- `check_assumptions_for_anova()` — normality + sphericity + homogeneity screening for ANOVA workflows
+
+## Reporting
+
+Helpers for publication-ready output, often LaTeX-friendly:
+
+- `report_mean_and_sd()` — descriptive statistics
+- `report_npav()` / `report_npav_chi()` — non-parametric results
+- `report_art()` — Aligned Rank Transform results
+- `report_npar_ld()` — non-parametric longitudinal data
+- `report_dunn_test()` / `report_dunn_test_table()` — Dunn's post-hoc tests
+- `report_pairwise_paper_style()` — pairwise comparisons in paper format
+- `latexify_report()` — convert reports to LaTeX
+
+## Visualization
+
+- `gg_withinstats_with_normality_check()` — within-subjects plot with stats overlay
+- `gg_betweenstats_with_normality_check()` — between-subjects plot with stats overlay
+- `generate_effect_plot()` — effect size visualization
+- `generate_mobo_plot()` — multi-objective optimization plot
+
+## Data Processing
+
+- `replace_values()` — recode values
+- `reshape_data()` — wide/long transforms
+- `add_pareto_column()` — Pareto optimality labels
+- `remove_outliers_rei()` — outlier removal
+
+## Package Structure
+
+```
+rcode/
+├── __init__.py                  # public re-exports
+├── setup.py
+├── assumptions.py
+├── reporting.py
+├── visualization.py
+├── data_processing.py
+├── questionnaire_processing.py
+└── utils.py
+```
+
+## Implementation Note
+
+The Python port covers all major workflows from the original R version. Some statistical operations (e.g., repeated-measures ANOVA, Friedman, Kruskal-Wallis) delegate to established libraries (`pingouin`, `scipy`, `statsmodels`) rather than reimplementing them from scratch.
 
 ## Citation
 
-If you use the original rCode concept or this Python adaptation in research, cite the upstream work by Mark Colley.
+If you use `rcode` or the original rCode in research, please cite the upstream work by Mark Colley.

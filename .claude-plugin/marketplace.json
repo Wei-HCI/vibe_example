@@ -1,0 +1,13 @@
+{
+  "name": "vibe-example-local",
+  "owner": {
+    "name": "rCode"
+  },
+  "plugins": [
+    {
+      "name": "super-analysis",
+      "source": "./",
+      "description": "Local development build of the Super Analyze plugin."
+    }
+  ]
+}

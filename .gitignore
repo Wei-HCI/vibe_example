@@ -19,3 +19,18 @@ build/
 # OS
 Thumbs.db
 .DS_Store
+
+# Virtual environments
+myenv/
+.venv/
+
+# Generated analysis outputs
+analyze_*.py
+cleaned_scored.csv
+*_cleaned_scored.csv
+*cleaned_scored*.csv
+*_analysis_summary.txt
+*_anova_prompt1_summary.txt
+*summary*.txt
+figures/*.png
+text_dataset/figures/

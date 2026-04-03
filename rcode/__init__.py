@@ -48,3 +48,9 @@ from rcode.questionnaire_processing import (
     process_ssq,
     process_sus,
 )
+from rcode.super_analyze import (
+    build_method_recommendations,
+    build_scan_report,
+    preprocess_questionnaire_data,
+    read_table,
+)

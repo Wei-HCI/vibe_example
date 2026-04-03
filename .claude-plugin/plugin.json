@@ -1,8 +1,22 @@
 {
-  "name": "super-analyze",
-  "description": "Super Analyze — a statistical analysis workflow orchestrator for experimental research data. Supports IPQ, SSQ, NASA-TLX questionnaires with auto-detection, human confirmation, and traceable script generation.",
-  "version": "1.0.0",
+  "name": "super-analysis",
+  "description": "Human-in-the-loop statistical analysis plugin on top of rcode. Adds deterministic dataset scan, method recommendation, and traceable script generation workflows.",
+  "version": "1.1.0",
   "author": {
     "name": "rCode"
-  }
+  },
+  "commands": [
+    "./commands/run.md"
+  ],
+  "homepage": "https://github.com/M-Colley/rCode",
+  "repository": "https://github.com/M-Colley/rCode",
+  "license": "MIT",
+  "keywords": [
+    "statistics",
+    "questionnaires",
+    "analysis",
+    "research",
+    "human-in-the-loop",
+    "rcode"
+  ]
 }
