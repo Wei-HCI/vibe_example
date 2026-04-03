@@ -1,0 +1,8 @@
+{
+  "name": "super-analyze",
+  "description": "Super Analyze — a statistical analysis workflow orchestrator for experimental research data. Supports IPQ, SSQ, NASA-TLX questionnaires with auto-detection, human confirmation, and traceable script generation.",
+  "version": "1.0.0",
+  "author": {
+    "name": "rCode"
+  }
+}
