@@ -1,157 +1,134 @@
-# rCode (Python Edition)
+# Super Analyze
 
-> Python port of [rCode](https://github.com/M-Colley/rCode) by [Mark Colley](https://m-colley.github.io/)
+> Human-in-the-loop statistical analysis plugin for experimental research data
 
-`rcode` is a Python package that streamlines statistical analysis and APA-compliant result reporting. It is a port of the original R package, built on top of `scipy`, `pingouin`, `statsmodels`, `matplotlib`, and `seaborn`.
+Super Analyze is a workflow layer on top of `rcode`. It helps you go from raw questionnaire data to an auditable analysis script, cleaned data export, summary text, and figures.
 
-## What Was Changed in This Python Port
+It is not a standalone statistics engine. It orchestrates:
+- data scan and questionnaire/design detection
+- user confirmation at key decision points
+- questionnaire scoring through `rcode` when available
+- method recommendation per dependent variable
+- script generation with traceability comments
 
-Compared to Mark Colley's original `rCode` (R), this Python edition mainly introduces:
+## What It Is
 
-- A modular Python package layout (`rcode.setup`, `rcode.assumptions`, `rcode.reporting`, `rcode.visualization`, `rcode.data_processing`, `rcode.utils`) for reusable workflow-based analysis.
-- Python-native statistical integration based on `scipy`, `pingouin`, `statsmodels`, and `scikit-posthocs` to reproduce and extend core inferential workflows.
-- Automated APA-oriented reporting helpers that generate publication-ready LaTeX strings (e.g., NPAV, ART, Dunn, pairwise paper-style results with effect sizes).
-- Expanded plotting utilities for within/between-subject comparisons and multi-factor effect visualization using matplotlib/seaborn objects (`Figure`, `Axes`) for downstream customization.
-- Extra data-processing helpers (normalization, reshaping, value replacement, Pareto sorting, REI outlier detection) to support end-to-end analysis pipelines in Python.
+Super Analyze is designed for command-driven use inside Claude Code.
 
-## Requirements
+Typical flow:
+1. You invoke `/statistical-analysis path/to/data.csv`
+2. The workflow scans the file and proposes questionnaire type, design, ID column, condition column, and dependent variables
+3. You confirm or correct the detection
+4. The workflow scores the questionnaire, checks assumptions, recommends methods, and asks for confirmation again
+5. It generates an auditable analysis script plus outputs
 
-- Python >= 3.10
+This is not "press one button and trust the result". The plugin recommends. You decide.
 
-### Core Dependencies
+## How To Use
 
-| Package | Version |
-|---|---|
-| numpy | >= 1.24 |
-| pandas | >= 2.0 |
-| scipy | >= 1.10 |
-| matplotlib | >= 3.7 |
-| seaborn | >= 0.12 |
-| statsmodels | >= 0.14 |
-| pingouin | >= 0.5 |
-| scikit-posthocs | >= 0.8 |
-| pyperclip | >= 1.8 |
-| openpyxl | >= 3.1 |
-
-## Installation
-
-> It is strongly recommended to create a dedicated virtual environment to avoid dependency conflicts.
-
-### Step 1: Create a virtual environment
+1. Install Python dependencies for this repository:
 
 ```bash
 python -m venv myenv
-```
-
-### Step 2: Activate the environment
-
-**Windows:**
-
-```bash
 myenv\Scripts\activate
-```
-
-**macOS / Linux:**
-
-```bash
-source myenv/bin/activate
-```
-
-### Step 3: Install dependencies
-
-```bash
 pip install -r requirements.txt
 pip install -e .
 ```
 
-## AI Coding Tool Setup
+2. Install the plugin in Claude Code from this repository path:
 
-Installation links:
-
-- Claude Code: [https://code.claude.com/docs/en/overview](https://code.claude.com/docs/en/overview)
-- Codex: [https://github.com/openai/codex](https://github.com/openai/codex)
-
-## Key Features
-
-- **Automated Assumption Checking**: Verify normality (Shapiro-Wilk) and homogeneity of variance (Levene's test) for ANOVA models.
-- **APA-Compliant LaTeX Reporting**: Generate copy-paste-ready LaTeX strings for NPAV, ART, Dunn tests, mean/SD, and more.
-- **Enhanced Visualizations**: Box/violin plots with automatic parametric/non-parametric test selection and significance annotations.
-- **Data Processing Utilities**: Normalize, replace values, Pareto front classification, REI-based outlier detection.
-
-## Visualization Example
-
-Below is an exploratory data analysis produced with `rcode.visualization`, demonstrating histogram, scatter plot with regression line, correlation matrix, and box plot outputs:
-
-![Exploratory Data Analysis - WHO Life Expectancy Dataset](figures/eda_example.png)
-
-## Quick Start
-
-```python
-import pandas as pd
-from rcode import setup, check_assumptions_for_anova, report_mean_and_sd
-
-# Setup (sets matplotlib defaults, prints citation)
-setup()
-
-# Check ANOVA assumptions
-df = pd.read_csv("data.csv")
-result = check_assumptions_for_anova(df, y="score", factors=["group", "condition"])
-print(result)
-
-# Report mean and SD in LaTeX
-report_mean_and_sd(df, iv="group", dv="score")
+```text
+/plugin install /path/to/this/repository
 ```
 
-## Prompt Example: Generate Custom Violin Plots
+3. Restart Claude Code.
 
-Use the following prompts with an AI coding assistant when you want the generated analysis script to remain auditable across different models, agents, or API providers.
+4. Invoke the workflow with a data file:
 
-**Prompt 1** - Generate an analysis script with explicit method traceability:
-
-> Based on the raw questionnaire file in my `text_dataset` directory, identify the questionnaire type, preprocess the data with the scoring rules defined in this project, export a cleaned scored CSV containing only the final analysis variables, then generate the requested plots by calling the functions from this project, and run the script in `myenv`.
->
-> Strict requirements:
-> 1. Reuse functions from this repository whenever a matching function already exists instead of silently re-implementing the analysis logic.
-> 2. At the top of the generated script, add a short `Analysis Plan` comment block that states the detected questionnaire, the dependent variables, whether the design is within-subjects or between-subjects, and the statistical decision rule that will be used.
-> 3. Structure the generated script as clearly separated analysis blocks with numbered section headers, following the style of a research script rather than a compact utility script. At minimum, use blocks for: loading libraries, reading data, cleaning / reshaping, descriptive statistics, assumption checks, main inferential analysis, post-hoc analysis or an explicit "not needed" block, summary of results, and plot generation.
-> 4. Before each block, write a short multi-line comment that states:
->    - what this block does
->    - which repository function(s) are used in this block
->    - what statistical method is being run in this block
->    - why this method is appropriate for the current design
->    - what fallback rule applies if the repository does not provide the needed function
-> 5. Inside the script, keep the comments local to the code they describe. Do not only describe the pipeline at the top of the file; the explanation must be repeated block by block where the code is executed.
-> 6. If the repository does not contain a required function, implement the missing step explicitly in the script and label that block as a local fallback rather than a repository-backed step.
-> 7. Print a short method summary to the console before generating plots, including the exact function names used for scoring, assumption checks, inferential testing, post-hoc testing, and reporting.
-> 8. Do not use vague comments such as "run statistics here" or "analyze data". Every analysis block must name the actual method, for example: Shapiro-Wilk, repeated-measures ANOVA, ART, Wilcoxon signed-rank, paired t-test, Holm correction, or descriptive mean/SD reporting.
-> 9. Keep the visualization customization separate from the statistical logic so that later style changes do not alter the analysis path.
->
-> When refining plot aesthetics later, preserve the analysis comments and the printed method summary unless I explicitly ask to change the statistics.
-
-**Prompt 2** - Customize colors and style without changing the analysis logic:
-
-> Change the colors of the three groups to match the reference image (green, orange, purple), remove all scatter points from the violin plot, keep only the mean, and preserve the existing analysis method comments and printed method summary.
-
-### Sample Output
-
-The script generates both violin plots and paper-style LaTeX text for each dependent variable. Example output:
-
-```latex
-\textit{FVR} ($M = 23.23$, $SD = 4.01$) did not differ significantly from
-\textit{Remote} ($M = 23.03$, $SD = 2.76$) in spatial presence (sp)
-($t(29) = 0.30$, $p = .766$).
-
-\textit{LocoScooter} ($M = 6.07$, $SD = 0.62$) was rated significantly higher
-than \textit{Joystick} ($M = 3.36$, $SD = 1.69$) in physical demand
-($W = 91$, $p = .001$, $r = 0.64$).
+```text
+/statistical-analysis text_dataset/ipq.csv
 ```
 
-Example violin plot output:
+## Workflow
 
-![Violin Plot Output Sample](figures/image-3.png)
+The plugin is built around three confirmation nodes.
 
-The function `report_pairwise_paper_style()` automatically:
-1. Checks normality of paired differences (Shapiro-Wilk)
-2. Selects the appropriate test (paired *t*-test or Wilcoxon signed-rank)
-3. Reports *M*, *SD*, test statistic, *p*-value
-4. Includes effect size (Cohen's *d* or rank-biserial *r*) for significant results
+### Confirmation 1: Detection
+
+The workflow scans the file and proposes:
+- questionnaire type
+- subject ID column
+- condition column
+- dependent variables
+- design type
+
+You confirm or correct the proposal before preprocessing starts.
+
+### Confirmation 2: Method Choice
+
+After scoring and assumption checks, the workflow recommends a method per dependent variable, for example:
+- paired t-test vs Wilcoxon signed-rank
+- repeated-measures ANOVA vs Friedman
+- one-way ANOVA vs Kruskal-Wallis
+
+You accept or override the recommendation.
+
+### Confirmation 3: Output
+
+After the main analysis, you review the omnibus results and decide whether to continue to post-hoc tests, figures, and reporting outputs.
+
+## Outputs
+
+The primary output is always the analysis script.
+
+Expected outputs:
+- `analyze_xxx.py`
+- `cleaned_scored.csv`
+- `summary.txt`
+- `figures/*.png`
+
+The script is the auditable core. Reports and figures can be regenerated from it.
+
+## Supported Questionnaires
+
+Current workflow support is centered on:
+- IPQ
+- SSQ
+- SUS
+- NASA-TLX
+
+For `IPQ`, `SSQ`, and `SUS`, the workflow can reuse repository scoring functions when the file layout matches or when explicit column mapping is supplied.
+
+For `NASA-TLX`, scoring is currently handled as a local fallback because `rcode` does not yet expose a dedicated `process_nasa_tlx()` function.
+
+## Relationship To `rcode`
+
+`Super Analyze` is the orchestration layer.
+
+`rcode` is the statistical helper library underneath it.
+
+In practice:
+- `rcode` handles things like questionnaire scoring, descriptive reporting, assumption checks, and visualization helpers
+- `Super Analyze` handles scanning, asking, selecting methods, and generating traceable scripts
+
+When `rcode` does not yet expose a wrapper for a needed analysis step, the generated script may use a local fallback through established libraries such as `pingouin`, `scipy`, or `statsmodels`.
+
+That fallback is still auditable because the generated script labels:
+- which blocks are repository-backed
+- which blocks are local fallback
+- which statistical method is used
+- why that method was chosen
+
+## Plugin Scope
+
+This repository contains both:
+- the `rcode` Python package
+- the `Super Analyze` plugin and workflow design
+
+If you want the package-level documentation for `rcode` itself, see [README-rcode.md](C:\Users\adminroot\Documents\GitHub\vibe_example\README-rcode.md).
+
+## Notes
+
+- The plugin is intended for human-in-the-loop research workflows, not blind automation.
+- Auto-detection is a recommendation, not ground truth.
+- The most important review artifact is always the generated script.
