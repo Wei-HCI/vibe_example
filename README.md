@@ -123,29 +123,6 @@ The plugin is built around three confirmation nodes.
   +-------------------------------------------------------------------+
 ```
 
-### Confirmation 1: Detection
-
-The workflow scans the file and proposes:
-- questionnaire type
-- subject ID column
-- condition column
-- dependent variables
-- design type
-
-You confirm or correct the proposal before preprocessing starts.
-
-### Confirmation 2: Method Choice
-
-After scoring and assumption checks, the workflow recommends a method per dependent variable, for example:
-- paired t-test vs Wilcoxon signed-rank
-- repeated-measures ANOVA vs Friedman
-- one-way ANOVA vs Kruskal-Wallis
-
-You accept or override the recommendation.
-
-### Confirmation 3: Output
-
-After the main analysis, you review the omnibus results and decide whether to continue to post-hoc tests, figures, and reporting outputs.
 
 ## Outputs
 
