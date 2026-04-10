@@ -10,7 +10,8 @@
 It turns raw data into a reproducible analysis workflow with automatic detection, explicit review gates, and traceable output artifacts.
 
 <p align="center">
-  <a href="README_zh.md"><img alt="中文说明文档" src="https://img.shields.io/badge/中文文档-README_zh.md-1f6feb?logo=readthedocs&logoColor=white" /></a>
+  <a href="README.md"><img alt="English" src="https://img.shields.io/badge/English-current-111827?style=for-the-badge" /></a>
+  <a href="README_zh.md"><img alt="中文" src="https://img.shields.io/badge/中文-切换-1f6feb?style=for-the-badge" /></a>
 </p>
 
 ---
