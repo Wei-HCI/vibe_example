@@ -10,8 +10,7 @@
 它通过自动识别、显式确认节点和可追踪产物，将原始实验数据转为可复现的分析工作流。
 
 <p align="center">
-  <a href="README.md"><img alt="English" src="https://img.shields.io/badge/English-switch-1f6feb?style=for-the-badge" /></a>
-  <a href="README_zh.md"><img alt="中文" src="https://img.shields.io/badge/中文-当前-111827?style=for-the-badge" /></a>
+  <a href="README.md">English</a> | <a href="README_zh.md">中文</a>
 </p>
 
 ---

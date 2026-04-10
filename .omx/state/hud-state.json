@@ -1,6 +1,6 @@
 {
-  "last_turn_at": "2026-04-10T11:06:32.055Z",
-  "turn_count": 12,
-  "last_progress_at": "2026-04-10T11:06:32.055Z",
-  "last_agent_output": "{\"message\":\"Add bilingual README language switch buttons\"}"
+  "last_turn_at": "2026-04-10T11:08:21.660Z",
+  "turn_count": 14,
+  "last_progress_at": "2026-04-10T11:08:21.660Z",
+  "last_agent_output": "{\"message\":\"Simplify README language switch links\"}"
 }
